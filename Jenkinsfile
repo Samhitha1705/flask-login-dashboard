@@ -1,41 +1,51 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        IMAGE_NAME = "login-app"
+        CONTAINER_NAME = "login-app-container"
+        PORT = "5000"
+    }
 
+    stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Samhitha1705/flask-login-dashboard.git'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'pip install -r requirements.txt'
-            }
-        }
-
-        stage('Code Validation') {
-            steps {
-                sh 'python -m py_compile app.py'
+                git branch: 'main', url: 'https://github.com/Samhitha1705/flask-login-dashboard.git'
             }
         }
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t flask-login-app .'
+                bat """
+                docker build -t %IMAGE_NAME% .
+                """
             }
         }
 
-        stage('Deploy') {
+        stage('Docker Stop & Remove Existing Container') {
             steps {
-                sh '''
-                docker stop flask-login || true
-                docker rm flask-login || true
-                docker run -d -p 5000:5000 --name flask-login flask-login-app
-                '''
+                bat """
+                docker stop %CONTAINER_NAME% || exit 0
+                docker rm %CONTAINER_NAME% || exit 0
+                """
             }
+        }
+
+        stage('Docker Run') {
+            steps {
+                bat """
+                docker run -d -p %PORT%:%PORT% --name %CONTAINER_NAME% %IMAGE_NAME%
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully! App should be running at http://localhost:%PORT%"
+        }
+        failure {
+            echo "Pipeline failed. Check the console output for errors."
         }
     }
 }
