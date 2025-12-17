@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h4 class="card-title">📊 Login Dashboard</h4>
+
+        {% if logged_in %}
+          <p class="mt-2">Welcome back, <b>{{ username }}</b> 👋</p>
+        {% else %}
+          <p>Please login to see statistics</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if logged_in %}
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <h6>Total Logins</h6>
+            <h3 class="text-primary">{{ total_logins }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <h6>Unique Users</h6>
+            <h3 class="text-success">{{ user_count }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6>Users</h6>
+            <ul class="list-group list-group-flush">
+              {% for u in users %}
+                <li class="list-group-item">{{ u }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
